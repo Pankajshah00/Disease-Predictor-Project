@@ -1,0 +1,10 @@
+flask
+numpy
+pandas
+pickle-mixin
+textblob
+scikit-learn
+nltk
+geopy
+requests
+openai

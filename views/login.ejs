@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Coding Thinker</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        .container {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .box {
+            background-color: dodgerblue;
+            padding: 50px;
+            text-align: center;
+            border: 2px solid pink;
+            border-radius: 20px;
+        }
+        input {
+            height: 30px;
+            width: 300px;
+            background-color: #fff;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+        button {
+            height: 40px;
+            width: 310px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: black;
+        }
+        #message {
+            color: white;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box">
+            <form id="login-form">
+                <h2>Log-In</h2>
+                <input type="email" id="email" name="Email" placeholder="Email" required>
+                <br>
+                <input type="password" id="password" name="Password" placeholder="Password" required>
+                <br>
+                <button type="submit">Log-In</button>
+            </form>
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const message = document.getElementById('message');
+        const loginScriptURL = 'https://script.google.com/macros/s/AKfycbxA17GQR-ASeTZjup1hzslF5z-8bmuo4m6X2t10uf1OX_qB_2J1Szumv3Q1kqH_RApg/exec';
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(loginForm);
+            const email = formData.get('Email');
+            const password = formData.get('Password');
+
+            fetch(`${loginScriptURL}?email=${email}&password=${password}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === "success") {
+                        message.innerHTML = "Login Successful! Redirecting...";
+                        setTimeout(() => window.location.href = "index.html", 2000);
+                    } else {
+                        message.innerHTML = "Invalid email or password.";
+                    }
+                })
+                .catch(error => {
+                    message.innerHTML = "Error: " + error.message;
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Disease Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9f5f9; /* Light blue background */
+            color: #333;
+            padding-top: 56px; /* Space for fixed navbar */
+        }
+
+        /* Navigation Bar Styling */
+        .navbar {
+            background-color: #0056b3; /* Darker blue for navbar */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #cceeff !important;
+        }
+
+        /* Main Container Styling */
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Headings */
+        h1, h2, h3, h4, h5 {
+            color: #0056b3; /* Darker blue for headings */
+            font-weight: 600;
+        }
+
+        .text-primary {
+            color: #007bff !important;
+        }
+        .text-success {
+            color: #28a745 !important;
+        }
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+        .bg-info {
+            background-color: #17a2b8 !important;
+        }
+        .bg-secondary {
+            background-color: #6c757d !important;
+        }
+        .bg-dark {
+            background-color: #343a40 !important;
+        }
+        .border-primary {
+            border-color: #007bff !important;
+        }
+        .border-success {
+            border-color: #28a745 !important;
+        }
+        .border-info {
+            border-color: #17a2b8 !important;
+        }
+        .border-secondary {
+            border-color: #6c757d !important;
+        }
+
+        /* Form Elements */
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        /* Prediction Result Card */
+        .result-card {
+            border-left: 5px solid #28a745; /* Green border for results */
+        }
+
+        /* Emergency Alert */
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .alert-danger .alert-heading {
+            color: white;
+        }
+
+        /* List Styling */
+        .list-group-item {
+            border-color: #f0f0f0;
+        }
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Buttons within list items */
+        .list-group-item .btn-outline-info {
+            color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .list-group-item .btn-outline-info:hover {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        /* Modals */
+        .modal-header {
+            border-bottom: none;
+        }
+        .modal-footer {
+            border-top: none;
+        }
+
+        /* Spinner for loading states */
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        /* --- Print Styles --- */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+            .navbar, .form-section, .btn-section, .alert,
+            .map-container, .loading, .ambulance-contact-info,
+            .footer, .developer-link, .modal-backdrop, .modal,
+            .card-footer, .row.g-4.mt-5, /* Hide the hospital/drug info cards when printing */
+            .btn /* Generic button hide for printing */
+            {
+                display: none !important;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                padding: 20px;
+                width: 100%;
+            }
+            .result-card {
+                border: none;
+                background-color: #fff;
+                padding: 0;
+            }
+            h1, h2, h3, h4, h5 {
+                color: #000 !important;
+            }
+            /* Ensure text is black for printing */
+            p, li, ul {
+                color: #000 !important;
+            }
+            .list-group-item {
+                background-color: #fff !important;
+            }
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 767.98px) { /* Small devices (landscape phones, tablets) */
+            .container {
+                padding: 20px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border-radius: 0; /* Remove rounded corners on small screens */
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+            h4 {
+                font-size: 1.2rem;
+            }
+            .btn {
+                width: 100%; /* Make buttons full width */
+                margin-bottom: 10px;
+            }
+            .btn-group-vertical > .btn + .btn {
+                margin-left: 0;
+            }
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 575.98px) { /* Extra small devices (portrait phones) */
+            body {
+                padding-top: 52px; /* Adjust for smaller fixed navbar */
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Disease Predictor</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('history') }}"><i class="fas fa-history me-1"></i>History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-1"></i>Logout ({{ current_user.username }})</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}"><i class="fas fa-user-plus me-1"></i>Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('developer') }}"><i class="fas fa-code me-1"></i>About Developer</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h1 class="mb-4 text-center text-primary fw-bold">Predict Disease from Symptoms</h1>
+
+        <div class="card shadow-lg mb-5 border-0 rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" action="{{ url_for('home') }}" class="form-section">
+                    <div class="mb-4">
+                        <label for="symptoms" class="form-label fs-5 fw-semibold text-dark">
+                            <i class="fas fa-microscope me-2 text-info"></i>Enter Your Symptoms
+                        </label>
+                        <input type="text" class="form-control form-control-lg border-primary" id="symptoms" name="symptoms"
+                               placeholder="e.g., fever, headache, cough, fatigue" value="{{ original_symptoms_input }}" required>
+                        <div class="form-text text-muted mt-2">
+                            Separate each symptom with a comma. Be as descriptive as possible!
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-sm">
+                        <i class="fas fa-search me-2"></i>Get Prediction
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if prediction %}
+            <div class="card shadow-lg mb-5 {% if emergency %}border-danger{% else %}border-success{% endif %} rounded-3 result-card">
+                <div class="card-header {% if emergency %}bg-danger{% else %}bg-success{% endif %} text-white py-3 rounded-top-3 d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0"><i class="fas fa-flask me-2"></i>Prediction Result</h2>
+                    {% if emergency %}
+                        <span class="badge bg-light text-danger fs-6 p-2"><i class="fas fa-exclamation-triangle me-1"></i>Emergency! Seek Help!</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4 p-md-4">
+                    <p class="card-text fs-5">
+                        <strong><i class="fas fa-tag me-2"></i>Predicted Condition:</strong>
+                        <span class="{% if emergency %}text-danger{% else %}text-success{% endif %} fw-bold">{{ prediction }}</span>
+                    </p>
+
+                    {% if recognized_symptoms %}
+                        <p class="card-text text-muted">
+                            <strong><i class="fas fa-check-circle me-2"></i>Recognized Symptoms:</strong>
+                            {{ ', '.join(recognized_symptoms) }}
+                        </p>
+                    {% else %}
+                        <p class="card-text text-warning">
+                            <i class="fas fa-exclamation-circle me-2"></i>No specific symptoms were reliably recognized from your input.
+                            The prediction might be based on general factors or a very weak match. Please try more descriptive or common symptoms.
+                        </p>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <h3 class="h5 fw-semibold text-dark mb-3"><i class="fas fa-info-circle me-2"></i>Description:</h3>
+                    <p class="text-secondary">{{ description }}</p>
+
+                    {% if precautions %}
+                        <h3 class="h5 fw-semibold text-dark mt-4 mb-3"><i class="fas fa-shield-alt me-2"></i>Precautions:</h3>
+                        <ul class="list-group list-group-flush border-bottom mb-4">
+                            {% for p in precautions %}
+                                <li class="list-group-item bg-light text-dark border-0 py-2"><i class="fas fa-caret-right me-2 text-primary"></i>{{ p }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if medications %}
+                        <h3 class="h5 fw-semibold text-dark mt-4 mb-3"><i class="fas fa-pills me-2"></i>Suggested Medications:</h3>
+                        <ul id="predictionMedications" class="list-group list-group-flush border-bottom mb-4">
+                            {% for m in medications %}
+                                <li class="list-group-item bg-light text-dark border-0 d-flex justify-content-between align-items-center py-2">
+                                    <span><i class="fas fa-prescription-bottle me-2 text-primary"></i>{{ m }}</span>
+                                    <button type="button" class="btn btn-sm btn-outline-info rounded-pill view-drug-details" data-drug-name="{{ m }}">
+                                        <i class="fas fa-info-circle me-1"></i>Details
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if diets %}
+                        <h3 class="h5 fw-semibold text-dark mt-4 mb-3"><i class="fas fa-utensils me-2"></i>Diet Recommendations:</h3>
+                        <ul class="list-group list-group-flush border-bottom mb-4">
+                            {% for d in diets %}
+                                <li class="list-group-item bg-light text-dark border-0 py-2"><i class="fas fa-leaf me-2 text-primary"></i>{{ d }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if workouts %}
+                        <h3 class="h5 fw-semibold text-dark mt-4 mb-3"><i class="fas fa-running me-2"></i>Workout Recommendations:</h3>
+                        <ul class="list-group list-group-flush mb-4">
+                            {% for w in workouts %}
+                                <li class="list-group-item bg-light text-dark border-0 py-2"><i class="fas fa-dumbbell me-2 text-primary"></i>{{ w }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <div class="mt-4 text-center btn-section">
+                        <button class="btn btn-info me-2 shadow-sm" onclick="printSummary()"><i class="fas fa-print me-1"></i>Print Summary</button>
+                        <button class="btn btn-secondary shadow-sm" onclick="shareSummary()"><i class="fas fa-share-alt me-1"></i>Share Summary</button>
+                    </div>
+
+                    {% if emergency %}
+                        <div class="alert alert-danger mt-4 p-4 shadow-sm" role="alert">
+                            <h4 class="alert-heading fw-bold"><i class="fas fa-hospital-alt me-2"></i>Immediate Medical Attention Recommended!</h4>
+                            <p class="mb-3">Based on your symptoms or the nature of the condition, it is crucial to contact emergency services or visit the nearest hospital without delay.</p>
+                            <hr>
+                            <p class="fw-bold mb-2">Emergency Contact Numbers:</p>
+                            <ul class="list-unstyled mb-0 ambulance-contact-info">
+                                {% for country, number in ambulance_contacts.items() %}
+                                    <li><strong>{{ country }}:</strong> <a href="tel:{{ number }}" class="text-white fw-bold text-decoration-none">{{ number }}</a></li>
+                                {% endfor %}
+                            </ul>
+                            <p class="small mt-2">Always call your local emergency number if you believe it is a medical emergency.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center p-4 rounded-3 shadow-sm" role="alert">
+                <i class="fas fa-lightbulb me-2"></i>
+                Enter your symptoms above to get a personalized disease prediction and health guidance.
+                <p class="mt-2 mb-0 small">This tool is for informational purposes only and not a substitute for professional medical advice.</p>
+            </div>
+        {% endif %}
+
+        <div class="row g-4 mt-5">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100 border-info rounded-3">
+                    <div class="card-header bg-info text-white py-3 rounded-top-3">
+                        <h3 class="h5 mb-0"><i class="fas fa-hospital me-2"></i>Find Nearby Hospitals</h3>
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-4">
+                        <p class="card-text text-secondary">Locate healthcare facilities close to your current position.</p>
+                        <div class="map-container">
+                            <button id="findHospitals" class="btn btn-info btn-lg w-100 rounded-pill shadow-sm">
+                                <i class="fas fa-map-marker-alt me-2"></i>Search Hospitals
+                            </button>
+                            <div id="hospitalsList" class="mt-3">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100 border-secondary rounded-3">
+                    <div class="card-header bg-secondary text-white py-3 rounded-top-3">
+                        <h3 class="h5 mb-0"><i class="fas fa-pills me-2"></i>Drug Information</h3>
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-4">
+                        <p class="card-text text-secondary">
+                            Click "Details" on a suggested medication above, or search for a drug here.
+                        </p>
+                        <div>
+                            <input type="text" class="form-control border-secondary mb-3" id="drugSearchInput" placeholder="Enter drug name, e.g., Paracetamol">
+                            <button id="searchDrugInfo" class="btn btn-secondary btn-lg w-100 rounded-pill shadow-sm">
+                                <i class="fas fa-flask me-2"></i>Search Drug Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="drugDetailsModal" tabindex="-1" aria-labelledby="drugDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-3 shadow-lg">
+                <div class="modal-header bg-dark text-white rounded-top-3">
+                    <h5 class="modal-title" id="drugDetailsModalLabel"><i class="fas fa-prescription-bottle-alt me-2"></i>Drug Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="modal-drug-content">
+                        <p class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading drug details...</p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const findHospitalsBtn = document.getElementById('findHospitals');
+            const hospitalsListDiv = document.getElementById('hospitalsList');
+
+            if (findHospitalsBtn) {
+                findHospitalsBtn.addEventListener('click', () => {
+                    findHospitalsBtn.disabled = true; // Disable button to prevent multiple clicks
+                    findHospitalsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Finding...';
+                    hospitalsListDiv.innerHTML = '<p class="text-info text-center mt-3"><i class="fas fa-spinner fa-spin me-1"></i>Getting your location and searching for hospitals...</p>';
+                    getNearbyHospitals();
+                });
+            }
+
+            function getNearbyHospitals() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+
+                            fetch('/nearby_hospitals', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ lat: lat, lon: lon }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                displayHospitals(data);
+                                findHospitalsBtn.disabled = false;
+                                findHospitalsBtn.innerHTML = '<i class="fas fa-map-marker-alt me-2"></i>Search Hospitals';
+                            })
+                            .catch((error) => {
+                                console.error('Error fetching nearby hospitals:', error);
+                                hospitalsListDiv.innerHTML = '<p style="color: red;"><i class="fas fa-times-circle me-1"></i>Error fetching hospitals. Please try again or check your internet connection.</p>';
+                                findHospitalsBtn.disabled = false;
+                                findHospitalsBtn.innerHTML = '<i class="fas fa-map-marker-alt me-2"></i>Search Hospitals';
+                            });
+                        },
+                        (error) => {
+                            console.error('Geolocation error:', error);
+                            let errorMessage = 'Unable to retrieve your location.';
+                            switch(error.code) {
+                                case error.PERMISSION_DENIED:
+                                    errorMessage += ' Please enable location services for this site in your browser settings.';
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    errorMessage += ' Location information is unavailable.';
+                                    break;
+                                case error.TIMEOUT:
+                                    errorMessage += ' The request to get user location timed out.';
+                                    break;
+                                case error.UNKNOWN_ERROR:
+                                    errorMessage += ' An unknown error occurred.';
+                                    break;
+                            }
+                            hospitalsListDiv.innerHTML = `<p style="color: red;"><i class="fas fa-times-circle me-1"></i>${errorMessage}</p>`;
+                            findHospitalsBtn.disabled = false;
+                            findHospitalsBtn.innerHTML = '<i class="fas fa-map-marker-alt me-2"></i>Search Hospitals';
+                        }
+                    );
+                } else {
+                    hospitalsListDiv.innerHTML = '<p style="color: red;"><i class="fas fa-times-circle me-1"></i>Geolocation is not supported by your browser.</p>';
+                    findHospitalsBtn.disabled = false;
+                    findHospitalsBtn.innerHTML = '<i class="fas fa-map-marker-alt me-2"></i>Search Hospitals';
+                }
+            }
+
+            function displayHospitals(data) {
+                if (data.error) {
+                    hospitalsListDiv.innerHTML = `<p style="color: red;"><i class="fas fa-times-circle me-1"></i>${data.error}</p>`;
+                    return;
+                }
+                if (data.message) { // For cases where backend sends a message, e.g., "no hospitals found"
+                    hospitalsListDiv.innerHTML = `<p class="text-muted"><i class="fas fa-exclamation-circle me-1"></i>${data.message}</p>`;
+                    return;
+                }
+
+                if (data.length === 0) {
+                    hospitalsListDiv.innerHTML = '<p class="text-muted"><i class="fas fa-exclamation-circle me-1"></i>No hospitals found near your location.</p>';
+                    return;
+                }
+
+                const ul = document.createElement('ul');
+                ul.classList.add('list-group', 'list-group-flush', 'mt-3'); // Add Bootstrap list classes
+                data.forEach(hospital => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'bg-light'); // Add Bootstrap list item classes
+                    li.innerHTML = `
+                        <div>
+                            <strong>${hospital.name}</strong><br>
+                            <small class="text-muted">${hospital.address}</small>
+                        </div>
+                        <a href="${hospital.map_url || 'https://www.openstreetmap.org/'}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="fas fa-map-marked-alt me-1"></i>View Map
+                        </a>
+                    `;
+                    ul.appendChild(li);
+                });
+                hospitalsListDiv.innerHTML = ''; // Clear previous message
+                hospitalsListDiv.appendChild(ul);
+            }
+
+            // --- Drug Details Modal Functionality ---
+            const drugDetailsModalElement = document.getElementById('drugDetailsModal');
+            const drugDetailsModal = new bootstrap.Modal(drugDetailsModalElement);
+            const modalDrugContent = document.getElementById('modal-drug-content');
+
+            // Attach event listeners to medication buttons from prediction results
+            // Use event delegation for dynamically added buttons
+            document.getElementById('predictionMedications')?.addEventListener('click', function(event) {
+                if (event.target.classList.contains('view-drug-details')) {
+                    const drugName = event.target.dataset.drugName;
+                    fetchDrugDetails(drugName);
+                }
+            });
+
+
+            // Event listener for the separate drug search input
+            document.getElementById('searchDrugInfo').addEventListener('click', function() {
+                const drugName = document.getElementById('drugSearchInput').value.trim();
+                if (drugName) {
+                    fetchDrugDetails(drugName);
+                } else {
+                    alert('Please enter a drug name to search.');
+                }
+            });
+
+            function fetchDrugDetails(drugName) {
+                modalDrugContent.innerHTML = '<p class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading drug details...</p>';
+                drugDetailsModal.show();
+
+                fetch('/get_drug_details', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ drug_name: drugName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        modalDrugContent.innerHTML = `
+                            <div class="alert alert-warning" role="alert">
+                                <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Information Not Found</h6>
+                                <p class="mb-0">Details for "<strong>${data.name}</strong>" are not available in our database. Please consult a pharmacist or doctor.</p>
+                            </div>
+                            <p class="mt-3 text-muted">Description: ${data.description}</p>
+                        `;
+                    } else {
+                        modalDrugContent.innerHTML = `
+                            <h5 class="text-primary fw-bold mb-3">${data.name}</h5>
+                            <p class="mb-2"><strong><i class="fas fa-file-alt me-2"></i>Description:</strong> ${data.description}</p>
+                            <h6 class="mt-3 fw-semibold text-dark"><i class="fas fa-exclamation-circle me-2"></i>Possible Side Effects:</h6>
+                            <ul class="list-unstyled mb-2">
+                                ${data.side_effects && data.side_effects.length > 0 ? data.side_effects.map(se => `<li><i class="fas fa-minus me-2 text-danger"></i>${se}</li>`).join('') : '<li>No common side effects listed.</li>'}
+                            </ul>
+                            <h6 class="mt-3 fw-semibold text-dark"><i class="fas fa-notes-medical me-2"></i>Dosage Information:</h6>
+                            <p>${data.dosage_info}</p>
+                            ${data.link ? `<p class="mt-3 text-end"><a href="${data.link}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill"><i class="fas fa-external-link-alt me-1"></i>Learn more on Wikipedia</a></p>` : ''}
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching drug details:', error);
+                    modalDrugContent.innerHTML = '<p class="text-danger"><i class="fas fa-times-circle me-2"></i>Failed to load drug details due to a network error. Please check your internet connection.</p>';
+                });
+            }
+
+            // --- Print Function ---
+            function printSummary() {
+                // Create a temporary div to hold the content for printing
+                const printContent = document.createElement('div');
+                const resultCard = document.querySelector('.result-card'); // Select the main result card
+
+                if (resultCard) {
+                    // Clone the result card to avoid modifying the live DOM
+                    const clonedResult = resultCard.cloneNode(true);
+
+                    // Remove buttons from the cloned content that shouldn't be printed
+                    clonedResult.querySelectorAll('.btn-section, .view-drug-details').forEach(btn => btn.remove());
+                    // Remove the "Emergency Contact Numbers" section from printing if not needed, or make it text-only
+                    clonedResult.querySelectorAll('.ambulance-contact-info').forEach(el => {
+                        // For printing, we want text-only if possible, or remove the tel: links if not relevant
+                        // For now, let's just ensure the links are still visible as text
+                        // You could add a specific class to hide on print, if necessary
+                        // el.style.display = 'none'; // Example to hide
+                    });
+
+                    // Add a title for the printout
+                    const printTitle = document.createElement('h1');
+                    printTitle.textContent = "Disease Prediction Summary";
+                    printTitle.style.textAlign = 'center';
+                    printTitle.style.color = '#000'; // Ensure black text for printing
+
+                    printContent.appendChild(printTitle);
+                    printContent.appendChild(clonedResult);
+
+                    const originalBody = document.body.innerHTML;
+                    document.body.innerHTML = printContent.innerHTML;
+                    window.print();
+                    document.body.innerHTML = originalBody; // Restore original content
+                } else {
+                    alert('No prediction summary to print. Please enter symptoms and get a prediction first.');
+                }
+            }
+
+            // --- Share Function ---
+            function shareSummary() {
+                const predictionText = document.querySelector('.result-card .text-success.fw-bold, .result-card .text-danger.fw-bold')?.textContent;
+                const descriptionText = document.querySelector('.result-card p.text-secondary')?.textContent;
+                const precautionsList = Array.from(document.querySelectorAll('#predictionPrecautions .list-group-item'))
+                                            .map(item => item.textContent.trim());
+                const medicationsList = Array.from(document.querySelectorAll('#predictionMedications .list-group-item span'))
+                                            .map(item => item.textContent.trim());
+
+                let shareText = `Disease Prediction: ${predictionText || 'N/A'}\n\n`;
+                if (descriptionText) {
+                    shareText += `Description: ${descriptionText}\n\n`;
+                }
+                if (precautionsList.length > 0) {
+                    shareText += `Precautions:\n- ${precautionsList.join('\n- ')}\n\n`;
+                }
+                if (medicationsList.length > 0) {
+                    shareText += `Suggested Medications:\n- ${medicationsList.join('\n- ')}\n\n`;
+                }
+                shareText += "Generated by AI-Powered Disease Prediction System.";
+
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Disease Prediction Summary',
+                        text: shareText,
+                        url: window.location.href, // Share the current page URL
+                    })
+                    .then(() => console.log('Shared successfully'))
+                    .catch((error) => console.error('Error sharing:', error));
+                } else {
+                    // Fallback for browsers that do not support navigator.share
+                    alert("Sharing is not supported in this browser. You can manually copy the summary:\n\n" + shareText);
+                    console.log("Sharing is not supported in this browser. Summary to copy:", shareText);
+                }
+            }
+
+            // Make functions globally accessible if they are called directly from HTML attributes (like onclick)
+            window.printSummary = printSummary;
+            window.shareSummary = shareSummary;
+
+        });
+    </script>
+</body>
+</html>
